@@ -2,10 +2,10 @@ flask==2.3.3
 segment-anything @ git+https://github.com/facebookresearch/segment-anything.git
 torch>=2.2.0
 torchvision>=0.17.0
-opencv-python==4.8.0.76
+opencv-python==4.8.1.78
 numpy==1.24.3
-Pillow==9.5.0
+Pillow==10.3.0
 python-dotenv==1.0.0
 diffusers==0.21.4
-transformers==4.33.2
+transformers==4.48.0
 accelerate==0.23.0
