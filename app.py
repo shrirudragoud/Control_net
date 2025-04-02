@@ -20,6 +20,14 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 CHECKPOINT_PATH = "sam_vit_h_4b8939.pth"
 image_processor = None
 
+# Default prompts for different clothing types
+CLOTHING_PROMPTS = {
+    "default": "a photo of a person wearing the clothing, full body shot, high quality, detailed",
+    "shirt": "a photo of a person wearing the shirt, professional photo, full body, high quality",
+    "dress": "a photo of a person wearing the dress, professional photo, full body, high quality",
+    "pants": "a photo of a person wearing the pants, professional photo, full body, high quality"
+}
+
 def init_image_processor():
     global image_processor
     try:
@@ -46,6 +54,9 @@ def upload_file():
         return jsonify({'error': 'No file part'}), 400
     
     file = request.files['file']
+    clothing_type = request.form.get('clothing_type', 'default')
+    custom_prompt = request.form.get('prompt', '')
+    
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
@@ -76,11 +87,26 @@ def upload_file():
                 image_processor.apply_mask_to_image(filepath, mask_path, masked_path)
                 logger.info(f"Applied mask and saved result: {masked_path}")
                 
+                # Generate try-on image
+                prompt = custom_prompt if custom_prompt else CLOTHING_PROMPTS.get(clothing_type, CLOTHING_PROMPTS['default'])
+                tryon_filename = f'tryon_{filename}'
+                tryon_path = os.path.join(app.config['UPLOAD_FOLDER'], tryon_filename)
+                
+                try:
+                    result_image = image_processor.generate_try_on(filepath, mask_path, prompt)
+                    image_processor.postprocess_result(result_image, tryon_path)
+                    logger.info(f"Generated and saved try-on image: {tryon_path}")
+                except Exception as e:
+                    logger.error(f"Error generating try-on image: {str(e)}")
+                    return jsonify({'error': f'Error generating try-on image: {str(e)}'}), 500
+                
                 return jsonify({
                     'success': True,
                     'original_image': filename,
                     'mask_image': mask_filename,
-                    'masked_image': masked_filename
+                    'masked_image': masked_filename,
+                    'tryon_image': tryon_filename,
+                    'prompt_used': prompt
                 })
                 
             except Exception as e:

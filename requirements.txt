@@ -6,6 +6,8 @@ opencv-python==4.8.0.76
 numpy==1.24.3
 Pillow==9.5.0
 python-dotenv==1.0.0
-diffusers==0.21.4
-transformers==4.33.2
-accelerate==0.23.0
+diffusers>=0.21.4
+transformers>=4.33.2
+accelerate>=0.23.0
+controlnet_aux
+xformers

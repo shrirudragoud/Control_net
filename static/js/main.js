@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusText = document.getElementById('statusText');
     const originalImage = document.getElementById('originalImage');
     const maskImage = document.getElementById('maskImage');
-    const resultImage = document.getElementById('resultImage');
+    const maskedImage = document.getElementById('maskedImage');
+    const tryonImage = document.getElementById('tryonImage');
+    const promptInfo = document.getElementById('promptInfo');
+    const usedPrompt = document.getElementById('usedPrompt');
 
     // File size validation (16MB)
     const MAX_FILE_SIZE = 16 * 1024 * 1024;
@@ -14,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const fileInput = document.getElementById('clothingImage');
+        const clothingType = document.getElementById('clothingType').value;
+        const customPrompt = document.getElementById('customPrompt').value.trim();
         const file = fileInput.files[0];
         
         if (!file) {
@@ -41,6 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create FormData
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('clothing_type', clothingType);
+        if (customPrompt) {
+            formData.append('prompt', customPrompt);
+        }
 
         try {
             // Upload and process image
@@ -60,7 +69,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(data.error);
             }
 
-            updateProgress(60, 'Processing image...');
+            // Update progress for different stages
+            updateProgress(50, 'Generating mask...');
+            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UI
+            
+            updateProgress(70, 'Processing try-on...');
+            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UI
 
             // Display results
             originalImage.src = `/uploads/${data.original_image}`;
@@ -70,8 +84,18 @@ document.addEventListener('DOMContentLoaded', function() {
             maskImage.alt = 'Segmented mask';
 
             if (data.masked_image) {
-                resultImage.src = `/uploads/${data.masked_image}`;
-                resultImage.alt = 'Masked result';
+                maskedImage.src = `/uploads/${data.masked_image}`;
+                maskedImage.alt = 'Masked result';
+            }
+
+            if (data.tryon_image) {
+                tryonImage.src = `/uploads/${data.tryon_image}`;
+                tryonImage.alt = 'Try-on result';
+            }
+
+            if (data.prompt_used) {
+                usedPrompt.textContent = data.prompt_used;
+                promptInfo.classList.remove('d-none');
             }
             
             updateProgress(100, 'Processing complete!');
@@ -85,9 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateProgress(0, 'Processing failed');
             
             // Clear images on error
-            originalImage.src = '';
-            maskImage.src = '';
-            resultImage.src = '';
+            clearImages();
         }
     });
 
@@ -95,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateProgress(percent, status) {
         progressBar.style.width = `${percent}%`;
         progressBar.setAttribute('aria-valuenow', percent);
+        progressBar.textContent = `${percent}%`;
         statusText.textContent = status;
 
         // Update progress bar color based on status
@@ -146,6 +169,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.error-message, .success-message').forEach(el => el.remove());
     }
 
+    function clearImages() {
+        originalImage.src = '';
+        maskImage.src = '';
+        maskedImage.src = '';
+        tryonImage.src = '';
+        promptInfo.classList.add('d-none');
+    }
+
     // Preview image before upload
     document.getElementById('clothingImage').addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -170,19 +201,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const reader = new FileReader();
             reader.onload = function(e) {
                 originalImage.src = e.target.result;
-                clearProcessedImages();
+                clearOtherImages();
             }
             reader.readAsDataURL(file);
         }
     });
 
-    function clearImages() {
-        originalImage.src = '';
-        clearProcessedImages();
-    }
-
-    function clearProcessedImages() {
+    function clearOtherImages() {
         maskImage.src = '';
-        resultImage.src = '';
+        maskedImage.src = '';
+        tryonImage.src = '';
+        promptInfo.classList.add('d-none');
     }
 });

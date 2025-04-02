@@ -30,6 +30,24 @@
                             <input type="file" class="form-control" id="clothingImage" accept="image/png,image/jpeg,image/jpg" required>
                             <div class="form-text">Maximum file size: 16MB</div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="clothingType" class="form-label">Clothing Type</label>
+                            <select class="form-select" id="clothingType" name="clothingType">
+                                <option value="default">Auto-detect</option>
+                                <option value="shirt">Shirt/Top</option>
+                                <option value="dress">Dress</option>
+                                <option value="pants">Pants</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="customPrompt" class="form-label">Custom Prompt (Optional)</label>
+                            <textarea class="form-control" id="customPrompt" name="customPrompt" rows="3" 
+                                    placeholder="Enter custom prompt for image generation..."></textarea>
+                            <div class="form-text">Leave empty to use default prompt based on clothing type</div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="bi bi-arrow-right-circle"></i> Process Image
                         </button>
@@ -80,17 +98,36 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
-                                <div class="image-card">
-                                    <h5><i class="bi bi-person-square"></i> Final Result</h5>
+                            <div class="col-md-6">
+                                <div class="image-card mb-3">
+                                    <h5><i class="bi bi-intersect"></i> Masked Result</h5>
                                     <div class="image-wrapper">
-                                        <img id="resultImage" class="img-fluid preview-image" src="" alt="Try-on result">
+                                        <img id="maskedImage" class="img-fluid preview-image" src="" alt="Masked result">
+                                        <div class="image-placeholder">
+                                            <i class="bi bi-layers"></i>
+                                            <p>Masked result will appear here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="image-card">
+                                    <h5><i class="bi bi-person-square"></i> Try-On Result</h5>
+                                    <div class="image-wrapper">
+                                        <img id="tryonImage" class="img-fluid preview-image" src="" alt="Try-on result">
                                         <div class="image-placeholder">
                                             <i class="bi bi-stars"></i>
                                             <p>Generated result will appear here</p>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div id="promptInfo" class="mt-3 d-none">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Prompt Used:</strong>
+                                <span id="usedPrompt"></span>
                             </div>
                         </div>
                     </div>
