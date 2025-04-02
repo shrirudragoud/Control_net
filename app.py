@@ -109,6 +109,9 @@ def handle_exception(e):
 if __name__ == '__main__':
     try:
         init_image_processor()
-        app.run(debug=True)
+        # Get port from environment variable or default to 5000
+        port = int(os.environ.get('PORT', 5000))
+        # Listen on all available network interfaces
+        app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
     except Exception as e:
         logger.error(f"Failed to start application: {str(e)}")
