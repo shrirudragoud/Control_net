@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const tryonImage = document.getElementById('tryonImage');
     const promptInfo = document.getElementById('promptInfo');
     const usedPrompt = document.getElementById('usedPrompt');
+    const generateSection = document.getElementById('generateSection');
+    const generateForm = document.getElementById('generateForm');
+
+    let currentFilename = null;
 
     // File size validation (16MB)
     const MAX_FILE_SIZE = 16 * 1024 * 1024;
@@ -17,8 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const fileInput = document.getElementById('clothingImage');
-        const clothingType = document.getElementById('clothingType').value;
-        const customPrompt = document.getElementById('customPrompt').value.trim();
         const file = fileInput.files[0];
         
         if (!file) {
@@ -46,13 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create FormData
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('clothing_type', clothingType);
-        if (customPrompt) {
-            formData.append('prompt', customPrompt);
-        }
 
         try {
-            // Upload and process image
+            // Upload and process image for segmentation
             updateProgress(30, 'Uploading image...');
             const response = await fetch('/upload', {
                 method: 'POST',
@@ -70,11 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Update progress for different stages
-            updateProgress(50, 'Generating mask...');
-            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UI
-            
-            updateProgress(70, 'Processing try-on...');
-            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UI
+            updateProgress(70, 'Processing segmentation...');
 
             // Display results
             originalImage.src = `/uploads/${data.original_image}`;
@@ -88,20 +82,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 maskedImage.alt = 'Masked result';
             }
 
-            if (data.tryon_image) {
-                tryonImage.src = `/uploads/${data.tryon_image}`;
-                tryonImage.alt = 'Try-on result';
-            }
+            // Store current filename
+            currentFilename = data.original_image;
 
-            if (data.prompt_used) {
-                usedPrompt.textContent = data.prompt_used;
-                promptInfo.classList.remove('d-none');
-            }
+            // Show generate section
+            generateSection.classList.remove('d-none');
             
-            updateProgress(100, 'Processing complete!');
-
-            // Handle successful upload
-            showSuccess('Image processed successfully!');
+            updateProgress(100, 'Segmentation complete! Ready for try-on generation.');
+            showSuccess('Image segmented successfully! You can now generate the try-on.');
 
         } catch (error) {
             console.error('Error:', error);
@@ -110,6 +98,62 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Clear images on error
             clearImages();
+        }
+    });
+
+    generateForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        if (!currentFilename) {
+            showError('Please upload and segment an image first.');
+            return;
+        }
+
+        const clothingType = document.getElementById('clothingType').value;
+        const customPrompt = document.getElementById('customPrompt').value.trim();
+
+        updateProgress(30, 'Generating try-on image...');
+
+        try {
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: currentFilename,
+                    clothing_type: clothingType,
+                    prompt: customPrompt
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // Display try-on result
+            tryonImage.src = `/uploads/${data.tryon_image}`;
+            tryonImage.alt = 'Try-on result';
+
+            if (data.prompt_used) {
+                usedPrompt.textContent = data.prompt_used;
+                promptInfo.classList.remove('d-none');
+            }
+
+            updateProgress(100, 'Try-on generation complete!');
+            showSuccess('Try-on image generated successfully!');
+
+        } catch (error) {
+            console.error('Error:', error);
+            showError(`Error: ${error.message}`);
+            updateProgress(0, 'Generation failed');
+            tryonImage.src = '';
         }
     });
 
@@ -175,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
         maskedImage.src = '';
         tryonImage.src = '';
         promptInfo.classList.add('d-none');
+        generateSection.classList.add('d-none');
+        currentFilename = null;
     }
 
     // Preview image before upload
@@ -212,5 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
         maskedImage.src = '';
         tryonImage.src = '';
         promptInfo.classList.add('d-none');
+        generateSection.classList.add('d-none');
+        currentFilename = null;
     }
 });

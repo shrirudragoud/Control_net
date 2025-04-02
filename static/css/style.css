@@ -32,21 +32,41 @@ body {
 }
 
 .upload-section .form-control,
-.upload-section .form-select {
+.upload-section .form-select,
+#generateSection .form-control,
+#generateSection .form-select {
     border-radius: 8px;
     border: 1px solid #dee2e6;
     transition: all 0.3s ease;
 }
 
 .upload-section .form-control:focus,
-.upload-section .form-select:focus {
+.upload-section .form-select:focus,
+#generateSection .form-control:focus,
+#generateSection .form-select:focus {
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
 }
 
-.upload-section .form-text {
+.form-text {
     color: #6c757d;
     font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Generate Section */
+#generateSection {
+    background-color: #f8f9fa;
+    border-left: 4px solid #28a745;
+}
+
+#generateSection .card-title {
+    color: #28a745;
+}
+
+#customPrompt {
+    min-height: 100px;
+    resize: vertical;
 }
 
 /* Progress Section */
@@ -59,12 +79,19 @@ body {
     border-radius: 10px;
     background-color: #e9ecef;
     overflow: hidden;
+    margin: 1rem 0;
 }
 
 .progress-bar {
     transition: width 0.3s ease;
     background-color: #007bff;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
 }
 
 .progress-bar.bg-success {
@@ -154,23 +181,37 @@ body {
 .image-placeholder i {
     font-size: 2rem;
     margin-bottom: 10px;
+    opacity: 0.7;
 }
 
 .image-placeholder p {
     margin: 0;
     font-size: 0.9rem;
+    opacity: 0.7;
 }
 
 /* Status Messages */
 .error-message,
 .success-message {
-    padding: 12px;
+    padding: 12px 15px;
     margin-top: 15px;
     border-radius: 8px;
     font-size: 0.9rem;
     text-align: center;
     animation: fadeIn 0.3s ease;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.error-message::before {
+    content: "⚠️";
+}
+
+.success-message::before {
+    content: "✅";
 }
 
 .error-message {
@@ -206,6 +247,11 @@ body {
     color: #0288d1;
 }
 
+/* Steps Indication */
+.card-title i {
+    margin-right: 8px;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from {
@@ -218,23 +264,8 @@ body {
     }
 }
 
-/* Navbar */
-.navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.navbar-brand i {
-    margin-right: 8px;
-}
-
-/* Custom Form Controls */
-textarea.form-control {
-    min-height: 100px;
-    resize: vertical;
-}
-
 /* Button Styles */
-.btn-primary {
+.btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -246,7 +277,21 @@ textarea.form-control {
     transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
+.btn i {
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
@@ -265,7 +310,11 @@ textarea.form-control {
         margin-bottom: 15px;
     }
     
-    .btn-primary {
+    .btn {
         padding: 10px 20px;
+    }
+    
+    .image-card h5 {
+        font-size: 1rem;
     }
 }

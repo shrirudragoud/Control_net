@@ -22,7 +22,7 @@
             <div class="col-md-4">
                 <div class="upload-section card p-3 mb-4">
                     <h3 class="card-title">
-                        <i class="bi bi-upload"></i> Upload Image
+                        <i class="bi bi-upload"></i> Step 1: Upload Image
                     </h3>
                     <form id="uploadForm" class="mt-3">
                         <div class="mb-3">
@@ -30,7 +30,17 @@
                             <input type="file" class="form-control" id="clothingImage" accept="image/png,image/jpeg,image/jpg" required>
                             <div class="form-text">Maximum file size: 16MB</div>
                         </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-magic"></i> Process Image
+                        </button>
+                    </form>
+                </div>
 
+                <div id="generateSection" class="card p-3 mb-4 d-none">
+                    <h3 class="card-title">
+                        <i class="bi bi-stars"></i> Step 2: Generate Try-On
+                    </h3>
+                    <form id="generateForm" class="mt-3">
                         <div class="mb-3">
                             <label for="clothingType" class="form-label">Clothing Type</label>
                             <select class="form-select" id="clothingType" name="clothingType">
@@ -44,12 +54,12 @@
                         <div class="mb-3">
                             <label for="customPrompt" class="form-label">Custom Prompt (Optional)</label>
                             <textarea class="form-control" id="customPrompt" name="customPrompt" rows="3" 
-                                    placeholder="Enter custom prompt for image generation..."></textarea>
+                                    placeholder="Describe how you want the final image to look..."></textarea>
                             <div class="form-text">Leave empty to use default prompt based on clothing type</div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-arrow-right-circle"></i> Process Image
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-brush"></i> Generate Try-On
                         </button>
                     </form>
                 </div>
@@ -126,7 +136,7 @@
                         <div id="promptInfo" class="mt-3 d-none">
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle"></i>
-                                <strong>Prompt Used:</strong>
+                                <strong>Prompt Used: </strong>
                                 <span id="usedPrompt"></span>
                             </div>
                         </div>
